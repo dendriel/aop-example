@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          cats:
+            url: https://cat-fact.herokuapp.com
+
+
+cats-client:
+  retries: 3
+
+resilience4j.retry:
+  instances:
+    cats-client:
+      maxAttempts: 3
+      waitDuration: 1s
+      enableExponentialBackoff: true
+      exponentialBackoffMultiplier: 2
+
+
+resilience4j.circuitbreaker:
+  instances:
+    cats-client:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: TIME_BASED
+      minimumNumberOfCalls: 20
+      waitDurationInOpenState: 50s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
